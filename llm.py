@@ -1,25 +1,20 @@
+
 import os
 
 from dotenv import load_dotenv
-from huggingface_hub import InferenceClient
-
+from groq import Groq
 
 load_dotenv()
 
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-HF_TOKEN = os.getenv("HF_TOKEN")
-
-
-if not HF_TOKEN:
+if not GROQ_API_KEY:
     raise ValueError(
-        "HF_TOKEN is not found. Please add your "
-        "Hugging Face token to the .env file."
+        "GROQ_API_KEY missing. Add it to your .env file "
+        "or Streamlit Cloud Secrets."
     )
 
-
-client = InferenceClient(
-    token=HF_TOKEN
-)
+client = Groq(api_key=GROQ_API_KEY)
 
 
 def generate_response(
@@ -27,19 +22,15 @@ def generate_response(
     temperature=0.2,
     max_tokens=500
 ):
-
-    response = client.chat_completion(
-        model="Qwen/Qwen2.5-72B-Instruct",
-
+    response = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
         ],
-
         temperature=temperature,
-
         max_tokens=max_tokens
     )
 
